@@ -16,128 +16,131 @@ public class CTATracker {
     public static int arrPosTwo = 0;
     public static void main(String[] args) throws Exception {
 
-final String url = "https://www.transitchicago.com/station/sprt/";
+        final String url = "https://www.transitchicago.com/station/sprt/";
+
+        try{
+            //go the the URL and create a new document of that URL (I think???)
+            Document document = Jsoup.connect(url).get();
+
+            //System.out.println(Element.getElementsByAttributeValueContaining(document, "estimated-arrivals-line-wrapper"));
+
+            /* after inspecting element and finding the code that pertains to the data we want (span.ea-line-time-big), for each time that element occurs in document, 
+            * create an element that contains the data stored in span.ea-line.time.big
+            * 
+            */
+            
+            for(Element timeData: document.select("span.ea-line-time-big")){
+
+                int bracketFirstPosition, bracketSecondPosition;
+                String strData;
+                String justNumber;
+
+                //convert the element to a string to later perform string manipulation
+                strData = timeData.toString();
+
+                //at this point the string strData will print out in this format (below)
+
+                /*  <span class="ea-line-time-big">Due</span>
+                <span class="ea-line-time-big">19</span>
+                <span class="ea-line-time-big">29</span>
+                <span class="ea-line-time-big">51</span>
+                <span class="ea-line-time-big">11</span>
+                <span class="ea-line-time-big">22</span>     */
+
+                //The data we want is the numbers and any instance of the word "Due" as those represent the next train times.
+                //We now need to modify the string strData to remove all of the giberish, leaving just the numbers or the word due
+
+                //find the position of ">" as the next character is the data we want.
+                bracketFirstPosition = strData.indexOf(">");
+
+                //create a new substring that deletes all of the giberish BEFORE the position of >
+                justNumber = strData.substring(bracketFirstPosition + 1);
+
+                //using that new string, find the position of <
+                bracketSecondPosition = justNumber.indexOf("<");
+
+                //reassign justNumber to its final format, deleting all the data that comes AFTER <
+                justNumber = justNumber.substring(0, bracketSecondPosition);
 
 
+                //System.out.println(justNumber);
+                arrivalTime[arrPos] = justNumber;
+                //System.out.println(arrivalTime[arrPos]);
+                arrPos++;
 
-try{
-    //go the the URL and create a new document of that URL (I think???)
-    Document document = Jsoup.connect(url).get();
+            
+            }
 
-    //System.out.println(Element.getElementsByAttributeValueContaining(document, "estimated-arrivals-line-wrapper"));
+            for(Element locationData: document.select("span.ea-line-title-bottom")){
 
-    /* after inspecting element and finding the code that pertains to the data we want (span.ea-line-time-big), for each time that element occurs in document, 
-     * create an element that contains the data stored in span.ea-line.time.big
-     * 
-    */
-    
-      for(Element timeData: document.select("span.ea-line-time-big")){
+                int bracketFirstPosition, bracketSecondPosition;
+                String strData;
+                String location;
 
-        int bracketFirstPosition, bracketSecondPosition;
-        String strData;
-        String justNumber;
+                //convert the element to a string to later perform string manipulation
+                strData = locationData.toString();
 
-        //convert the element to a string to later perform string manipulation
-        strData = timeData.toString();
+                //at this point the string strData will print out in this format (below)
 
-        //at this point the string strData will print out in this format (below)
+                /*  <span class="ea-line-time-big">Due</span>
+                <span class="ea-line-time-big">19</span>
+                <span class="ea-line-time-big">29</span>
+                <span class="ea-line-time-big">51</span>
+                <span class="ea-line-time-big">11</span>
+                <span class="ea-line-time-big">22</span>     */
 
-        /*  <span class="ea-line-time-big">Due</span>
-        <span class="ea-line-time-big">19</span>
-        <span class="ea-line-time-big">29</span>
-        <span class="ea-line-time-big">51</span>
-        <span class="ea-line-time-big">11</span>
-        <span class="ea-line-time-big">22</span>     */
+                //The data we want is the numbers and any instance of the word "Due" as those represent the next train times.
+                //We now need to modify the string strData to remove all of the giberish, leaving just the numbers or the word due
 
-        //The data we want is the numbers and any instance of the word "Due" as those represent the next train times.
-        //We now need to modify the string strData to remove all of the giberish, leaving just the numbers or the word due
+                //find the position of ">" as the next character is the data we want.
+                bracketFirstPosition = strData.indexOf(">");
 
-        //find the position of ">" as the next character is the data we want.
-        bracketFirstPosition = strData.indexOf(">");
+                //create a new substring that deletes all of the giberish BEFORE the position of >
+                location = strData.substring(bracketFirstPosition + 1);
 
-        //create a new substring that deletes all of the giberish BEFORE the position of >
-        justNumber = strData.substring(bracketFirstPosition + 1);
+                //using that new string, find the position of <
+                bracketSecondPosition = location.indexOf("<");
 
-        //using that new string, find the position of <
-        bracketSecondPosition = justNumber.indexOf("<");
-
-        //reassign justNumber to its final format, deleting all the data that comes AFTER <
-        justNumber = justNumber.substring(0, bracketSecondPosition);
+                //reassign location to its final format, deleting all the data that comes AFTER <
+                location = location.substring(0, bracketSecondPosition);
 
 
-        //System.out.println(justNumber);
-        arrivalTime[arrPos] = justNumber;
-        System.out.println(arrivalTime[arrPos]);
-        arrPos++;
+                //System.out.println(location);
+                arrivalLoc[arrPosTwo] = location;
+                //System.out.println(arrivalLoc[arrPosTwo]);
+                arrPosTwo++;
+            }
+        }
 
-      
+        catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+        finally{
+            printOut();
+        }
     }
 
-    for(Element locationData: document.select("span.ea-line-title-bottom")){
 
-        int bracketFirstPosition, bracketSecondPosition;
-        String strData;
-        String location;
-
-        //convert the element to a string to later perform string manipulation
-        strData = locationData.toString();
-
-        //at this point the string strData will print out in this format (below)
-
-        /*  <span class="ea-line-time-big">Due</span>
-        <span class="ea-line-time-big">19</span>
-        <span class="ea-line-time-big">29</span>
-        <span class="ea-line-time-big">51</span>
-        <span class="ea-line-time-big">11</span>
-        <span class="ea-line-time-big">22</span>     */
-
-        //The data we want is the numbers and any instance of the word "Due" as those represent the next train times.
-        //We now need to modify the string strData to remove all of the giberish, leaving just the numbers or the word due
-
-        //find the position of ">" as the next character is the data we want.
-        bracketFirstPosition = strData.indexOf(">");
-
-        //create a new substring that deletes all of the giberish BEFORE the position of >
-        location = strData.substring(bracketFirstPosition + 1);
-
-        //using that new string, find the position of <
-        bracketSecondPosition = location.indexOf("<");
-
-        //reassign location to its final format, deleting all the data that comes AFTER <
-        location = location.substring(0, bracketSecondPosition);
-
-
-        //System.out.println(location);
-        arrivalLoc[arrPosTwo] = location;
-        System.out.println(arrivalLoc[arrPosTwo]);
-        arrPosTwo++;
-
+    public static void printOut(){
+        //System.out.println("Printout:");
+        //System.out.println(arrivalTime.length);
+        System.out.println("To: " + arrivalLoc[0] + " arrives in " + arrivalTime[0] + " min");
+        System.out.println("To: " + arrivalLoc[1] + " arrives in " + arrivalTime[1] + " min");
+        System.out.println("To: " + arrivalLoc[2] + " arrives in " + arrivalTime[2] + " min");
+        System.out.println("To: " + arrivalLoc[3] + " arrives in " + arrivalTime[3] + " min");
+        System.out.println("To: " + arrivalLoc[4] + " arrives in " + arrivalTime[4] + " min");
+        System.out.println("To: " + arrivalLoc[5] + " arrives in " + arrivalTime[5] + " min");
+        //System.out.println("To: " + arrivalLoc[6] + " arrives in " + arrivalTime[6] + " min");
         
-    }
-    
-    
-   
-printOut();
-    
-}
-
-
-
-catch (Exception ex){
-    ex.printStackTrace();
-}
-
-
-
- 
-
-}
-
-public static void printOut(){
-for(int i = 0; i > arrivalTime.length-1; i++){
-    System.out.println(arrivalLoc[i] + " ");
-    System.out.print(arrivalTime[i]);
+        //This doesn't work for some reason
+        /*for(int i = 0; i > arrivalTime.length-1; i++){
+            System.out.println(i);
+            System.out.println(arrivalLoc[i] + " ");
+            System.out.print(arrivalTime[i]);
+            }
+        */
     }
 }
-}
+
 
