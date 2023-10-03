@@ -10,7 +10,8 @@ public class CTATracker {
 
     public static Element timeList;
 
-    public static String[] arrivalTime = new String[7];
+    public static double[] arrivalTime = new double[7];
+    public static double[] timeToLeave = new double[7];
     public static int arrPos = 0;
     public static String[] arrivalLoc = new String[7];
     public static int arrPosTwo = 0;
@@ -34,6 +35,7 @@ public class CTATracker {
                 int bracketFirstPosition, bracketSecondPosition;
                 String strData;
                 String justNumber;
+                int justInt;
 
                 //convert the element to a string to later perform string manipulation
                 strData = timeData.toString();
@@ -62,9 +64,11 @@ public class CTATracker {
                 //reassign justNumber to its final format, deleting all the data that comes AFTER <
                 justNumber = justNumber.substring(0, bracketSecondPosition);
 
+                justInt = Integer.valueOf(justNumber);
+
 
                 //System.out.println(justNumber);
-                arrivalTime[arrPos] = justNumber;
+                arrivalTime[arrPos] = justInt;
                 //System.out.println(arrivalTime[arrPos]);
                 arrPos++;
 
@@ -119,28 +123,71 @@ public class CTATracker {
         finally{
             printOut();
         }
+
+        timePrinter();
     }
 
 
-    public static void printOut(){
-        //System.out.println("Printout:");
-        //System.out.println(arrivalTime.length);
-        System.out.println("To: " + arrivalLoc[0] + " arrives in " + arrivalTime[0] + " min");
-        System.out.println("To: " + arrivalLoc[1] + " arrives in " + arrivalTime[1] + " min");
-        System.out.println("To: " + arrivalLoc[2] + " arrives in " + arrivalTime[2] + " min");
-        System.out.println("To: " + arrivalLoc[3] + " arrives in " + arrivalTime[3] + " min");
-        System.out.println("To: " + arrivalLoc[4] + " arrives in " + arrivalTime[4] + " min");
-        System.out.println("To: " + arrivalLoc[5] + " arrives in " + arrivalTime[5] + " min");
+public static void printOut(){
+     //System.out.println("Printout:");
+    //System.out.println(arrivalTime.length);
+    System.out.println("To: " + arrivalLoc[0] + " arrives in " + arrivalTime[0] + " min");
+    System.out.println("To: " + arrivalLoc[1] + " arrives in " + arrivalTime[1] + " min");
+    System.out.println("To: " + arrivalLoc[2] + " arrives in " + arrivalTime[2] + " min");
+    System.out.println("To: " + arrivalLoc[3] + " arrives in " + arrivalTime[3] + " min");
+    System.out.println("To: " + arrivalLoc[4] + " arrives in " + arrivalTime[4] + " min");
+    System.out.println("To: " + arrivalLoc[5] + " arrives in " + arrivalTime[5] + " min");
         //System.out.println("To: " + arrivalLoc[6] + " arrives in " + arrivalTime[6] + " min");
         
-        //This doesn't work for some reason
-        /*for(int i = 0; i > arrivalTime.length-1; i++){
-            System.out.println(i);
-            System.out.println(arrivalLoc[i] + " ");
-            System.out.print(arrivalTime[i]);
-            }
-        */
     }
+
+public static void timePrinter(){
+    
+    final int timeToWalk = 3;   
+       
+    int i;
+
+        try{
+            timeToLeave[0] = arrivalTime[0] - timeToWalk;  
+
+            if(timeToLeave[0] > timeToWalk){
+                Thread.sleep(3000);
+                double timeIncrement = 0.5;
+            
+                System.out.println("You have " + (timeToLeave[0] - timeIncrement) + " minutes till you must leave!");
+                timeToLeave[0] = timeToLeave[0] - timeIncrement;
+
+            }
+
+        else{
+
+        System.out.println("You don't have enough time to catch the next train! : ( ");
+        System.out.println("There is another train coming!");
+
+        timeToLeave[1] = arrivalTime[1] - timeToWalk;
+        System.out.println("You have " + timeToLeave[1] + " minutes till you must leave!");
+
+           while(timeToLeave[1] > timeToWalk){
+                Thread.sleep(3000);
+                double timeIncrement = 0.5;
+            
+                System.out.println("You have " + (timeToLeave[1] - timeIncrement) + " minutes till you must leave!");
+                timeToLeave[1] = timeToLeave[1] - timeIncrement;
+
+            }
+
+        
+        }
+
+        }
+
+    catch(InterruptedException e){}
+
+    
+}
+
+
+
 }
 
 
