@@ -1,6 +1,9 @@
 //import java.text.SimpleDateFormat;
 
 
+import java.util.ArrayList;
+import java.util.Scanner;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -9,16 +12,24 @@ import org.jsoup.nodes.Element;
 public class CTATracker {
 
     public static Element timeList;
-
-    public static double[] arrivalTime = new double[7];
-    public static double[] timeToLeave = new double[7];
-    public static int arrPos = 0;
-    public static String[] arrivalLoc = new String[7];
-    public static int arrPosTwo = 0;
+    public static int dir;
+    public static ArrayList<Integer> directions = new ArrayList<Integer>();
+    public static ArrayList<Integer> arrivalTime = new ArrayList<Integer>();
+    public static double[] timeToLeave = new double[2];
+    public static ArrayList<String> arrivalLoc = new ArrayList<String>();
+    public static ArrayList<String> arrivalLine = new ArrayList<String>();
+    public static int dirTwo;
+    
     public static void main(String[] args) throws Exception {
 
-        final String url = "https://www.transitchicago.com/station/sprt/";
+        Scanner scn = new Scanner(System.in);
+        String url;
+        //final String url = "https://www.transitchicago.com/station/sprt/";
+        //final String url = "https://www.transitchicago.com/station/belm/";
+        System.out.print("Enter URL of station:");
+        url = scn.nextLine();
 
+        
         try{
             //go the the URL and create a new document of that URL (I think???)
             Document document = Jsoup.connect(url).get();
@@ -64,25 +75,26 @@ public class CTATracker {
                 //reassign justNumber to its final format, deleting all the data that comes AFTER <
                 justNumber = justNumber.substring(0, bracketSecondPosition);
 
-                justInt = Integer.valueOf(justNumber);
+                if (justNumber.equals(" Due ")) {
+                 justInt = 0;   
+                }else{
+                    justInt = Integer.valueOf(justNumber);
+                }
 
-
-                //System.out.println(justNumber);
-                arrivalTime[arrPos] = justInt;
-                //System.out.println(arrivalTime[arrPos]);
-                arrPos++;
+                arrivalTime.add(justInt);
+                arrivalTime.get(0);
 
             
             }
 
-            for(Element locationData: document.select("span.ea-line-title-bottom")){
+            for(Element lineData: document.select("span.ea-line-title-bottom")){
 
                 int bracketFirstPosition, bracketSecondPosition;
                 String strData;
                 String location;
 
                 //convert the element to a string to later perform string manipulation
-                strData = locationData.toString();
+                strData = lineData.toString();
 
                 //at this point the string strData will print out in this format (below)
 
@@ -109,12 +121,63 @@ public class CTATracker {
                 location = location.substring(0, bracketSecondPosition);
 
 
-                //System.out.println(location);
-                arrivalLoc[arrPosTwo] = location;
-                //System.out.println(arrivalLoc[arrPosTwo]);
-                arrPosTwo++;
+                
+                arrivalLoc.add(location);
+                
             }
+
+            for(Element locationData: document.select("span.ea-line-title-top")){
+
+                int bracketFirstPosition, bracketSecondPosition;
+                String strData;
+                String line;
+
+                //convert the element to a string to later perform string manipulation
+                strData = locationData.toString();
+
+                //at this point the string strData will print out in this format (below)
+
+                //The data we want is the numbers and any instance of the word "Due" as those represent the next train times.
+                //We now need to modify the string strData to remove all of the giberish, leaving just the numbers or the word due
+
+                //find the position of ">" as the next character is the data we want.
+                bracketFirstPosition = strData.indexOf(">");
+
+                //create a new substring that deletes all of the giberish BEFORE the position of >
+                line = strData.substring(bracketFirstPosition + 1);
+
+                //using that new string, find the position of <
+                bracketSecondPosition = line.indexOf("<");
+
+                //reassign line to its final format, deleting all the data that comes AFTER <
+                line = line.substring(0, bracketSecondPosition-4);
+
+
+                arrivalLine.add(line);
+            }
+
+            for (int i = 0; i < arrivalLoc.size(); i++) {
+                if (directions.contains(arrivalLoc.indexOf(arrivalLoc.get(i)))) {
+                    //System.out.println("blah");
+                }else{
+                directions.add(arrivalLoc.indexOf(arrivalLoc.get(i)));
+                }
+            }
+            
+            System.out.println("Enter # for Destination");
+            for (int i = 0; i < directions.size(); i++) {
+                System.out.println(directions.get(i) + " for " + arrivalLoc.get(directions.get(i)));
+            }
+
+            System.out.println();
+            
+            dir = Integer.parseInt(scn.nextLine());
+
+
+
         }
+
+        
 
         catch (Exception ex){
             ex.printStackTrace();
@@ -124,21 +187,20 @@ public class CTATracker {
             printOut();
         }
 
+
+
         timePrinter();
+        scn.close();
     }
 
 
 public static void printOut(){
-     //System.out.println("Printout:");
-    //System.out.println(arrivalTime.length);
-    System.out.println("To: " + arrivalLoc[0] + " arrives in " + arrivalTime[0] + " min");
-    System.out.println("To: " + arrivalLoc[1] + " arrives in " + arrivalTime[1] + " min");
-    System.out.println("To: " + arrivalLoc[2] + " arrives in " + arrivalTime[2] + " min");
-    System.out.println("To: " + arrivalLoc[3] + " arrives in " + arrivalTime[3] + " min");
-    System.out.println("To: " + arrivalLoc[4] + " arrives in " + arrivalTime[4] + " min");
-    System.out.println("To: " + arrivalLoc[5] + " arrives in " + arrivalTime[5] + " min");
-        //System.out.println("To: " + arrivalLoc[6] + " arrives in " + arrivalTime[6] + " min");
-        
+
+        for (int i = 0; i < arrivalLoc.size(); i++) {
+            if (arrivalLoc.get(i).equals(arrivalLoc.get(dir))) {
+            System.out.println(arrivalLine.get(i) + " To:" + arrivalLoc.get(i) + "arrives in " + arrivalTime.get(i) + " min");
+            }
+        }
     }
 
 public static void timePrinter(){
@@ -148,7 +210,7 @@ public static void timePrinter(){
     int i;
 
         try{
-            timeToLeave[0] = arrivalTime[0] - timeToWalk;  
+            timeToLeave[0] = arrivalTime.get(dir) - timeToWalk;  
 
             if(timeToLeave[0] > timeToWalk){
                 Thread.sleep(3000);
@@ -164,7 +226,22 @@ public static void timePrinter(){
         System.out.println("You don't have enough time to catch the next train! : ( ");
         System.out.println("There is another train coming!");
 
-        timeToLeave[1] = arrivalTime[1] - timeToWalk;
+        
+
+        for(int j = 0; j < arrivalLoc.size(); j++){
+            if (arrivalLoc.get(j) == arrivalLoc.get(dir)) {
+                j++;
+                if (arrivalLoc.get(j).equals(arrivalLoc.get(dir))){
+                    dirTwo = j;
+                    break;
+                }else{
+                    j++;
+                }
+            }
+        }
+
+
+        timeToLeave[1] = arrivalTime.get(dirTwo) - timeToWalk;
         System.out.println("You have " + timeToLeave[1] + " minutes till you must leave!");
 
            while(timeToLeave[1] > timeToWalk){
